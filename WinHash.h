@@ -77,8 +77,9 @@ public:
             SHA256,
             SHA384,
             SHA512,
-            MaxHashId = SHA512,
-            InvalidHashId = (ULONG)-1
+
+            // keep always last
+            MaxHashId
         }alg;
 
     };
@@ -93,7 +94,7 @@ public:
 
         _HASH_INFO()
         {
-            AlgId = HashingAlg::InvalidHashId;
+            AlgId = HashingAlg::MaxHashId;
 
             pbHashDataRaw = NULL;
             cbHashDataRaw = 0;
@@ -128,7 +129,7 @@ public:
             ResetHashingInfo();
 
             cbSizeOfStructure = 0;
-            AlgId = HashingAlg::InvalidHashId;
+            AlgId = HashingAlg::MaxHashId;
         }
 
 
@@ -185,19 +186,19 @@ public:
 public:
 
     /*
-        Call this function to intialize a HASH_INFO structure before calling WinHashGetHash.
+        Call this function to intialize a HASH_INFO structure before calling GetHash.
 
         1. HashingAlgorithm AlgId: A hash algo id from the HashingAlgorithm enumeration data structure.
 
         2. Pointer to a HashInfo structure to initialize.
-        This will be used as an argument later with WinHashGetHash.
+        This will be used as an argument later with GetHash.
 
         Remarks
         -------
         If pHashInfo is NULL, the function fails and returns FALSE, otherwise it initializes 
         the structure and returns TRUE;
    */
-    static BOOL WinHashInitHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
+    static BOOL InitHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
 
 
 
@@ -221,11 +222,11 @@ public:
 
         If DataSize value is bigger than ULONG_MAX (0xFFFFFFFF), the function returns FALSE;
 
-        If the function succeeds, you must call WinHashDeleteHash once you have finished processing
+        If the function succeeds, you must call DeleteHash once you have finished processing
         the returned data in order to free the memory that was allocated to store the hashes.
 
         If you want to perform subsequent hashing over the resulting string hash pHashDataString, do not
-        call WinHashDeleteHash at this stage. See: WinHashInitReHashInfoStruct, WinHashReHash
+        call DeleteHash at this stage. See: InitReHashInfoStruct, ReHash
 
         Remarks
         --------
@@ -241,14 +242,14 @@ public:
         In order to avoid accidental string concatenations use (HashInfo.StringHashDataLength + 1) as the 
         size  of your buffer, and initialize your buffer to 0s before copying over the string hash.
     */
-    static BOOL WinHashGetHash(_In_ PHASH_INFO HashInfo, _In_ PBYTE pbData, _In_ ULONG DataSize);
+    static BOOL GetHash(_In_ PHASH_INFO HashInfo, _In_ PBYTE pbData, _In_ ULONG DataSize);
 
 
 
 
     /*
-        Re-Initializes a HASH_INFO structure that was previously used with WinHashGetHash function,
-        with the same or different HashingAlgoId for a subsequent call to WinHashReHash function.
+        Re-Initializes a HASH_INFO structure that was previously used with GetHash function,
+        with the same or different HashingAlgoId for a subsequent call to ReHash function.
 
         1. HashingAlgorithm AlgId: Hashing Alogorithm id to use for Re-Hashing.
         2. PHASH_INFO pHashInfo: Pointer to a HASH_INFO structure.
@@ -256,9 +257,9 @@ public:
         If the function succeeds returns TRUE, otherwise returns FALSE.
 
         If the function returns FALSE, and you no longer need to process the previously calculated hash,
-        call WinHashDeleteHash to free any memory allocated with a previous call to WinHashGetHash
+        call DeleteHash to free any memory allocated with a previous call to GetHash
    */
-    static BOOL WinHashInitReHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
+    static BOOL InitReHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
 
 
 
@@ -273,22 +274,22 @@ public:
         If the function succeeds returns TRUE and the HASH_INFO structure referenced by pHashInfo
         will contain the resulting hash calculation.
 
-        You must call WinHashDeleteHash once you have finished processing the returned data in order
+        You must call DeleteHash once you have finished processing the returned data in order
         to free the memory that was allocated to store the hashes.
 
-        If the function fails, returns FALSE. In this case there is no need to call WinHashDeleteHash, as
+        If the function fails, returns FALSE. In this case there is no need to call DeleteHash, as
         any memory buffer that was previously allocated is freed by this function.
     */
-    static BOOL WinHashReHash(_In_ PHASH_INFO pHashInfo, _In_ ULONG HashingIterations);
+    static BOOL ReHash(_In_ PHASH_INFO pHashInfo, _In_ ULONG HashingIterations);
 
 
 
     /*
-        Deletes hashes and frees memory allocated that stores the hashes during a previous call to WinHashGetHash.
+        Deletes hashes and frees memory allocated that stores the hashes during a previous call to GetHash.
         If HashInfo.pbHashDataRaw and/or HashInfo.pHashDataString are NULL the rest of the structure will be 
         sanitized.
     */
-    static VOID WinHashDeleteHash(_In_ PHASH_INFO pHashInfo);
+    static VOID DeleteHash(_In_ PHASH_INFO pHashInfo);
 
 };
 
