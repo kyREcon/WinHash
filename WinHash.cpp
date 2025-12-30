@@ -259,12 +259,12 @@ BOOL WinHash::WinHashGetHash(_In_ PHASH_INFO pHashInfo, _In_ PBYTE pbData, _In_ 
 
                             }
 
-                        }
 
+                            if (FALSE == bOK)
+                            {
+                                pHashInfo->ResetHashingInfo();
+                            }
 
-                        if (FALSE == bOK)
-                        {
-                            pHashInfo->ResetHashingInfo();
                         }
 
                     }
