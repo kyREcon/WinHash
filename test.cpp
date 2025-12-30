@@ -19,7 +19,7 @@ int main()
     WinHash::HASH_INFO HashInfo;
 
 
-    /*Print MD5 string hash */
+    /*Print MD5 string hash*/
     if (winhash.WinHashInitHashInfoStruct(WinHash::HashingAlgorithms::MD5, &HashInfo))
     {
 
@@ -29,7 +29,7 @@ int main()
             printf("MD5: %s\n\n\n", HashInfo.pszHashDataString);
 
 
-            /*Re-Hash MD5 string with SHA256 */
+            /*Re-Hash MD5 string with SHA256*/
             if (winhash.WinHashInitReHashInfoStruct(WinHash::HashingAlgorithms::SHA256, &HashInfo)) //if this fails, we must call WinHashDeleteHash to free memory allocated from WinHashGetHash
             {
                 if (winhash.WinHashReHash(&HashInfo, 2)) //if WinHashReHash fails we don't need to call WinHashDeleteHash
@@ -61,4 +61,5 @@ int main()
 
     (VOID)getchar();
     return 0;
+
 }
