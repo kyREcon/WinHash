@@ -30,7 +30,8 @@ int main()
 
 
             /*Re-Hash MD5 string with SHA256*/
-            if (winhash.WinHashInitReHashInfoStruct(WinHash::HashingAlgorithms::SHA256, &HashInfo)) //if this fails, we must call WinHashDeleteHash to free memory allocated from WinHashGetHash
+            //if this fails, we must call WinHashDeleteHash to free memory allocated from WinHashGetHash
+            if (winhash.WinHashInitReHashInfoStruct(WinHash::HashingAlgorithms::SHA256, &HashInfo))
             {
                 if (winhash.WinHashReHash(&HashInfo, 2)) //if WinHashReHash fails we don't need to call WinHashDeleteHash
                 {
@@ -63,3 +64,4 @@ int main()
     return 0;
 
 }
+
