@@ -33,7 +33,8 @@ int main()
             //if this fails, we must call WinHashDeleteHash to free memory allocated from WinHashGetHash
             if (winhash.WinHashInitReHashInfoStruct(WinHash::HashingAlgorithms::SHA256, &HashInfo))
             {
-                if (winhash.WinHashReHash(&HashInfo, 2)) //if WinHashReHash fails we don't need to call WinHashDeleteHash
+                //if WinHashReHash fails we don't need to call WinHashDeleteHash
+                if (winhash.WinHashReHash(&HashInfo, 2))
                 {
                     printf("SHA256(MD5): %s\n\n\n", HashInfo.pszHashDataString);
                     winhash.WinHashDeleteHash(&HashInfo);
@@ -64,4 +65,5 @@ int main()
     return 0;
 
 }
+
 
