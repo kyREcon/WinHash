@@ -181,8 +181,8 @@ public:
     WinHash() {}
     ~WinHash(){}
 
-public:
 
+public:
 
     /*
         Call this function to intialize a HASH_INFO structure before calling WinHashGetHash.
@@ -197,7 +197,7 @@ public:
         If pHashInfo is NULL, the function fails and returns FALSE, otherwise it initializes 
         the structure and returns TRUE;
    */
-    BOOL WinHashInitHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
+    static BOOL WinHashInitHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
 
 
 
@@ -241,7 +241,7 @@ public:
         In order to avoid accidental string concatenations use (HashInfo.StringHashDataLength + 1) as the 
         size  of your buffer, and initialize your buffer to 0s before copying over the string hash.
     */
-    BOOL WinHashGetHash(_In_ PHASH_INFO HashInfo, _In_ PBYTE pbData, _In_ ULONG DataSize);
+    static BOOL WinHashGetHash(_In_ PHASH_INFO HashInfo, _In_ PBYTE pbData, _In_ ULONG DataSize);
 
 
 
@@ -258,7 +258,7 @@ public:
         If the function returns FALSE, and you no longer need to process the previously calculated hash,
         call WinHashDeleteHash to free any memory allocated with a previous call to WinHashGetHash
    */
-    BOOL WinHashInitReHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
+    static BOOL WinHashInitReHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
 
 
 
@@ -279,7 +279,7 @@ public:
         If the function fails, returns FALSE. In this case there is no need to call WinHashDeleteHash, as
         any memory buffer that was previously allocated is freed by this function.
     */
-    BOOL WinHashReHash(_In_ PHASH_INFO pHashInfo, _In_ ULONG HashingIterations);
+    static BOOL WinHashReHash(_In_ PHASH_INFO pHashInfo, _In_ ULONG HashingIterations);
 
 
 
@@ -288,8 +288,7 @@ public:
         If HashInfo.pbHashDataRaw and/or HashInfo.pHashDataString are NULL the rest of the structure will be 
         sanitized.
     */
-    VOID WinHashDeleteHash(_In_ PHASH_INFO pHashInfo);
-
+    static VOID WinHashDeleteHash(_In_ PHASH_INFO pHashInfo);
 
 };
 

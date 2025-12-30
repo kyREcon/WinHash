@@ -15,15 +15,15 @@ int main()
     printf("\n\n\n");
 
 
-    WinHash winhash;
+
     WinHash::HASH_INFO HashInfo;
 
 
     /*Print MD5 string hash*/
-    if (winhash.WinHashInitHashInfoStruct(WinHash::HashingAlgorithms::MD5, &HashInfo))
+    if (WinHash::WinHashInitHashInfoStruct(WinHash::HashingAlgorithms::MD5, &HashInfo))
     {
 
-        if (winhash.WinHashGetHash(&HashInfo, (PBYTE)test.c_str(), (ULONG)strlen(test.c_str())))
+        if (WinHash::WinHashGetHash(&HashInfo, (PBYTE)test.c_str(), (ULONG)strlen(test.c_str())))
         {
 
             printf("MD5: %s\n\n\n", HashInfo.pszHashDataString);
@@ -31,30 +31,31 @@ int main()
 
             /*Re-Hash MD5 string with SHA256*/
             //if this fails, we must call WinHashDeleteHash to free memory allocated from WinHashGetHash
-            if (winhash.WinHashInitReHashInfoStruct(WinHash::HashingAlgorithms::SHA256, &HashInfo))
+            if (WinHash::WinHashInitReHashInfoStruct(WinHash::HashingAlgorithms::SHA256, &HashInfo))
             {
+
                 //if WinHashReHash fails we don't need to call WinHashDeleteHash
-                if (winhash.WinHashReHash(&HashInfo, 1))
+                if (WinHash::WinHashReHash(&HashInfo, 1))
                 {
                     printf("SHA256(MD5): %s\n\n\n", HashInfo.pszHashDataString);
-                    winhash.WinHashDeleteHash(&HashInfo);
+                    WinHash::WinHashDeleteHash(&HashInfo);
                 }
             }
             else
             {
-                winhash.WinHashDeleteHash(&HashInfo);
+                WinHash::WinHashDeleteHash(&HashInfo);
             }
         }
 
         /*Print all supported hashes for user input string.*/
         for (ULONG i = 0; i < WinHash::HashingAlgorithms::MaxHashId; i++)
         {
-            if (winhash.WinHashInitHashInfoStruct((WinHash::HashingAlg)i, &HashInfo))
+            if (WinHash::WinHashInitHashInfoStruct((WinHash::HashingAlg)i, &HashInfo))
             {
-                if (winhash.WinHashGetHash(&HashInfo, (PBYTE)test.c_str(), (ULONG)strlen(test.c_str())))
+                if (WinHash::WinHashGetHash(&HashInfo, (PBYTE)test.c_str(), (ULONG)strlen(test.c_str())))
                 {
                     printf("%ws: %s\n", WinHash::pwzHashingAlgos[i], HashInfo.pszHashDataString);
-                    winhash.WinHashDeleteHash(&HashInfo);
+                    WinHash::WinHashDeleteHash(&HashInfo);
                 }
             }
         }
@@ -63,8 +64,4 @@ int main()
 
     (VOID)getchar();
     return 0;
-
 }
-
-
-
