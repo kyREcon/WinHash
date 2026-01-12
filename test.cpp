@@ -20,10 +20,10 @@ int main()
 
 
     /*Print MD5 string hash*/
-    if (WinHash::InitHashInfoStruct(WinHash::HashingAlgorithms::MD5, &HashInfo))
+    if (WinHash::InitHashInfoStruct(WinHash::HashingAlgorithms::id::MD5, &HashInfo))
     {
 
-        if (WinHash::GetHash(&HashInfo, (PBYTE)test.c_str(), (ULONG)strlen(test.c_str())))
+        if (WinHash::GetHash(&HashInfo, reinterpret_cast<PBYTE>(test.data()), static_cast<ULONG>(test.length())))
         {
 
             printf("MD5: %s\n\n\n", HashInfo.pszHashDataString);
@@ -31,7 +31,7 @@ int main()
 
             /*Re-Hash MD5 string with SHA256*/
             //if this fails, we must call DeleteHash to free memory allocated from GetHash
-            if (WinHash::InitReHashInfoStruct(WinHash::HashingAlgorithms::SHA256, &HashInfo))
+            if (WinHash::InitReHashInfoStruct(WinHash::HashingAlgorithms::id::SHA256, &HashInfo))
             {
 
                 //if ReHash fails we don't need to call DeleteHash
@@ -48,11 +48,11 @@ int main()
         }
 
         /*Print all supported hashes for user input string.*/
-        for (ULONG i = 0; i < WinHash::HashingAlgorithms::MaxHashId; i++)
+        for (ULONG i = 0; i < static_cast<ULONG>(WinHash::HashingAlgorithms::id::MaxHashId); i++)
         {
-            if (WinHash::InitHashInfoStruct((WinHash::HashingAlg)i, &HashInfo))
+            if (WinHash::InitHashInfoStruct((WinHash::HashingAlgorithms::id)i, &HashInfo))
             {
-                if (WinHash::GetHash(&HashInfo, (PBYTE)test.c_str(), (ULONG)strlen(test.c_str())))
+                if (WinHash::GetHash(&HashInfo, reinterpret_cast<PBYTE>(test.data()), static_cast<ULONG>(test.length())))
                 {
                     printf("%ws: %s\n", WinHash::pwzHashingAlgos[i], HashInfo.pszHashDataString);
                     WinHash::DeleteHash(&HashInfo);

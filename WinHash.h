@@ -65,10 +65,10 @@ public:
 
 public:
 
-    struct _HashingAlgorithms
+    struct HashingAlgorithms
     {
 
-       typedef enum : ULONG
+        enum class id : ULONG
         {
             MD2,
             MD4,
@@ -80,21 +80,18 @@ public:
 
             // keep always last
             MaxHashId
-        }alg;
+        };
 
     };
 
-    typedef _HashingAlgorithms HashingAlgorithms;
-    typedef _HashingAlgorithms::alg HashingAlg;
-
 
 public:
-    struct _HASH_INFO
+    struct HASH_INFO
     {
 
-        _HASH_INFO()
+        HASH_INFO()
         {
-            AlgId = HashingAlg::MaxHashId;
+            AlgId = HashingAlgorithms::id::MaxHashId;
 
             pbHashDataRaw = NULL;
             cbHashDataRaw = 0;
@@ -106,12 +103,12 @@ public:
         }
 
 
-        BOOL Init(HashingAlg Id)
+        BOOL Init(HashingAlgorithms::id Id)
         {
             BOOL bOK = FALSE;
 
-            assert(Id < HashingAlg::MaxHashId);
-            bOK = Id < HashingAlg::MaxHashId;
+            assert(Id < HashingAlgorithms::id::MaxHashId);
+            bOK = Id < HashingAlgorithms::id::MaxHashId;
 
             if (bOK)
             {
@@ -129,7 +126,7 @@ public:
             ResetHashingInfo();
 
             cbSizeOfStructure = 0;
-            AlgId = HashingAlg::MaxHashId;
+            AlgId = HashingAlgorithms::id::MaxHashId;
         }
 
 
@@ -165,17 +162,17 @@ public:
         }
 
 
-        HashingAlg AlgId;
         PBYTE pbHashDataRaw;
         ULONG cbHashDataRaw;
         LPSTR pszHashDataString;
         ULONG cchStringHashLength;
         ULONG cbSizeOfStructure;
+
+        HashingAlgorithms::id AlgId;
     };
 
 
-    typedef _HASH_INFO HASH_INFO;
-    typedef _HASH_INFO* PHASH_INFO;
+    typedef HASH_INFO* PHASH_INFO;
 
 
 public:
@@ -198,7 +195,7 @@ public:
         If pHashInfo is NULL, the function fails and returns FALSE, otherwise it initializes 
         the structure and returns TRUE;
    */
-    static BOOL InitHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
+    static BOOL InitHashInfoStruct(_In_ HashingAlgorithms::id AlgId, _In_ PHASH_INFO pHashInfo);
 
 
 
@@ -259,7 +256,7 @@ public:
         If the function returns FALSE, and you no longer need to process the previously calculated hash,
         call DeleteHash to free any memory allocated with a previous call to GetHash
    */
-    static BOOL InitReHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo);
+    static BOOL InitReHashInfoStruct(_In_ HashingAlgorithms::id AlgId, _In_ PHASH_INFO pHashInfo);
 
 
 

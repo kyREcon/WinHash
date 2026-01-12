@@ -63,7 +63,14 @@ LPCWSTR WinHash::pwzHashingAlgos[MAX_HASHING_ALG_IDS] = { L"MD2", L"MD4", L"MD5"
 //--------------------------------------------------------------------------------
 
 
-static BOOL HashData(_In_ LPCWSTR& pcwzHashingAlgo, _In_ PBYTE& pbData, _In_ ULONG& DataSize, _Out_ PBYTE& pbHashHexRaw, _Out_ ULONG& cbHashHexRaw)
+static BOOL HashData
+(
+    _In_ LPCWSTR& pcwzHashingAlgo, 
+    _In_ PBYTE& pbData, 
+    _In_ ULONG& DataSize, 
+    _Out_ PBYTE& pbHashHexRaw, 
+    _Out_ ULONG& cbHashHexRaw
+)
 {
 
     BOOL bOK = FALSE;
@@ -81,7 +88,7 @@ static BOOL HashData(_In_ LPCWSTR& pcwzHashingAlgo, _In_ PBYTE& pbData, _In_ ULO
     {
 
         ULONG CryptObjLen = 0;
-        s = BCryptGetProperty(hAlgorithm, BCRYPT_OBJECT_LENGTH, (PUCHAR)&CryptObjLen, sizeof(CryptObjLen), &cbResult, 0);
+        s = BCryptGetProperty(hAlgorithm, BCRYPT_OBJECT_LENGTH, reinterpret_cast<PUCHAR>(&CryptObjLen), sizeof(CryptObjLen), &cbResult, 0);
 
         if (NT_SUCCESS(s))
         {
@@ -99,7 +106,7 @@ static BOOL HashData(_In_ LPCWSTR& pcwzHashingAlgo, _In_ PBYTE& pbData, _In_ ULO
                 if (NT_SUCCESS(s))
                 {
 
-                    s = BCryptGetProperty(hAlgorithm, BCRYPT_HASH_LENGTH, (PUCHAR)&cbHashHexRaw, sizeof(cbHashHexRaw), &cbResult, 0);
+                    s = BCryptGetProperty(hAlgorithm, BCRYPT_HASH_LENGTH, reinterpret_cast<PUCHAR>(&cbHashHexRaw), sizeof(cbHashHexRaw), &cbResult, 0);
 
                     if (NT_SUCCESS(s))
                     {
@@ -111,7 +118,7 @@ static BOOL HashData(_In_ LPCWSTR& pcwzHashingAlgo, _In_ PBYTE& pbData, _In_ ULO
                         {
 
                             SecureZeroMemory(pbHashHexRaw, cbHashHexRaw);
-                            s = BCryptHashData(hHash, pbData, (ULONG)DataSize, 0);
+                            s = BCryptHashData(hHash, pbData, DataSize, 0);
 
                             if (NT_SUCCESS(s))
                             {
@@ -152,7 +159,7 @@ static BOOL HashData(_In_ LPCWSTR& pcwzHashingAlgo, _In_ PBYTE& pbData, _In_ ULO
 //--------------------------------------------------------------------------------
 
 
-BOOL WinHash::InitHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo)
+BOOL WinHash::InitHashInfoStruct(_In_ HashingAlgorithms::id AlgId, _In_ PHASH_INFO pHashInfo)
 {
 
     assert(pHashInfo);
@@ -167,7 +174,7 @@ BOOL WinHash::InitHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInf
 
 //------------------------------------------------------------------------------------
 
-BOOL WinHash::InitReHashInfoStruct(_In_ HashingAlg AlgId, _In_ PHASH_INFO pHashInfo)
+BOOL WinHash::InitReHashInfoStruct(_In_ HashingAlgorithms::id AlgId, _In_ PHASH_INFO pHashInfo)
 {
 
     assert(pHashInfo);
@@ -212,15 +219,19 @@ BOOL WinHash::GetHash(_In_ PHASH_INFO pHashInfo, _In_ PBYTE pbData, _In_ ULONG D
 
                     pHashInfo->InitHashingInfo();
 
-                    assert(pHashInfo->AlgId < HashingAlgorithms::MaxHashId);
+                    assert(pHashInfo->AlgId < HashingAlgorithms::id::MaxHashId);
 
-                    if (pHashInfo->AlgId < HashingAlgorithms::MaxHashId)
+                    if (pHashInfo->AlgId < HashingAlgorithms::id::MaxHashId)
                     {
 
                         ULONG cbHashHexRawLength = 0;
                         PBYTE pbHashDataRaw = NULL;
 
-                        bOK = HashData(pwzHashingAlgos[pHashInfo->AlgId], pbData, DataSize, pbHashDataRaw, cbHashHexRawLength);
+                        bOK = HashData
+                        (
+                            pwzHashingAlgos[static_cast<ULONG>(pHashInfo->AlgId)], 
+                            pbData, DataSize, pbHashDataRaw, cbHashHexRawLength
+                        );
 
                         if (bOK)
                         {
@@ -291,7 +302,7 @@ BOOL WinHash::ReHash(_In_ PHASH_INFO pHashInfo, _In_ ULONG HashingIterations)
 
     HASH_INFO HashInfoTmp;
     ULONG cchStringHashLength = 0;
-    HashingAlg AlgId = pHashInfo->AlgId;
+    HashingAlgorithms::id AlgId = pHashInfo->AlgId;
 
     assert(pHashInfo);
     assert(HashingIterations);
@@ -303,7 +314,7 @@ BOOL WinHash::ReHash(_In_ PHASH_INFO pHashInfo, _In_ ULONG HashingIterations)
         if (InitHashInfoStruct(pHashInfo->AlgId, &HashInfoTmp))
         {
 
-            if (GetHash(&HashInfoTmp, (PBYTE)pHashInfo->pszHashDataString, (ULONG)pHashInfo->cchStringHashLength))
+            if (GetHash(&HashInfoTmp, reinterpret_cast<PBYTE>(pHashInfo->pszHashDataString), pHashInfo->cchStringHashLength))
             {
 
                 cchStringHashLength = HashInfoTmp.cchStringHashLength;
@@ -327,7 +338,7 @@ BOOL WinHash::ReHash(_In_ PHASH_INFO pHashInfo, _In_ ULONG HashingIterations)
                         if (bOK)
                         {
 
-                            bOK = GetHash(&HashInfoTmp, (PBYTE)pszHashStringTmp, cchStringHashLength);
+                            bOK = GetHash(&HashInfoTmp, reinterpret_cast<PBYTE>(pszHashStringTmp), cchStringHashLength);
 
                             if (bOK)
                             {
